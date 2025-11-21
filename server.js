@@ -111,6 +111,8 @@ app.get('/home', verifyToken, (req, res) => {
 const dashboardRoutes = require('./routes/dashboard');
 app.use('/api/dashboard', dashboardRoutes);
 
+const loanRoutes = require("./routes/loan-calculator");
+app.use("/api/loan", loanRoutes);
 
 // 6️⃣ Start Server
 const PORT = process.env.PORT || 5000;
