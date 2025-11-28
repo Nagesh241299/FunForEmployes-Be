@@ -129,7 +129,7 @@ app.use('/api/dashboard', dashboardRoutes);
 const loanRoutes = require("./routes/loan-calculator");
 app.use("/api/loan", loanRoutes);
 
-const balance = require("./routes/Balance");
+const balance = require("./routes/balance");
 app.use("/api/balance", balance);
 
 // 6️⃣ Start Server
