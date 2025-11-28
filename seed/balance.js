@@ -1,11 +1,9 @@
-// seed/balance.js
-require('dotenv').config(); // load .env variables
+require('dotenv').config({ path: '../.env' }); // explicitly point to backend/.env
 const mongoose = require('mongoose');
-
-// Replace with your actual model
-const Dashboard = require('../models/dashboard'); 
+const Balance = require('../models/Balance');
 
 const MONGODB_URI = process.env.MONGODB_URI;
+
 
 if (!MONGODB_URI) {
   console.error("Error: MONGODB_URI is not defined in .env file");
@@ -17,28 +15,29 @@ mongoose.connect(MONGODB_URI, {
   useUnifiedTopology: true,
 })
 .then(async () => {
-  console.log('Connected to MongoDB');
+  console.log('✅ Connected to MongoDB Atlas');
 
   try {
-    // Optional: Clear existing data
-    await Dashboard.deleteMany({});
-    console.log('Existing dashboards cleared');
+    // Clear existing data
+    await Balance.deleteMany({});
+    console.log('🧹 Existing balances cleared');
 
     // Seed new data
-    const dashboards = [
-      { name: 'Balance', amount: 12345 },
-      { name: 'Loans', amount: 3 },
-      { name: 'Payments', amount: 250 }
-    ];
+    const balanceData = {
+      grandTotal: 5000000,      // Example: 50 Lakh
+      loanDistributed: 2000000, // Example: 20 Lakh
+      limit: 1000000            // Example: 10 Lakh
+    };
 
-    await Dashboard.insertMany(dashboards);
-    console.log('Seed data inserted successfully');
+    await Balance.create(balanceData);
+    console.log('✅ Balance data seeded successfully');
   } catch (err) {
-    console.error('Error seeding data:', err);
+    console.error('❌ Error seeding data:', err);
   } finally {
     mongoose.disconnect();
+    process.exit(0);
   }
 })
 .catch(err => {
-  console.error('MongoDB connection error:', err);
+  console.error('❌ MongoDB connection error:', err);
 });

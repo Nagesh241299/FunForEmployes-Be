@@ -1,10 +1,13 @@
-// seed.js
 require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-// Get the connection string from .env
+// Ensure MONGODB_URI is set
 const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) {
+  console.error('❌ MONGODB_URI is not defined in the .env file');
+  process.exit(1); // Exit the process if the connection string is missing
+}
 
 async function seed() {
   try {
@@ -14,32 +17,34 @@ async function seed() {
     });
     console.log('✅ Connected to MongoDB');
 
-    // Define User model
+    // Define User model with additional fields
     const userSchema = new mongoose.Schema({
-      username: { type: String, required: true, unique: true },
+      name: { type: String, required: true },
+      email: { type: String, required: true, unique: true },
+      phone: { type: String, required: true, unique: true },
       password: { type: String, required: true },
     });
 
     const User = mongoose.model('User', userSchema);
 
-    // Clear existing users
-    await User.deleteMany({});
-    console.log('🧹 Old users removed');
+    // Clear existing users (and log the count of removed users)
+    const deletedUsers = await User.deleteMany({});
+    console.log(`🧹 Removed ${deletedUsers.deletedCount} old users`);
 
-    // Create sample users
+    // Create sample users with name, email, phone, and password
     const users = [
       {
-        username: 'admin',
+        name: 'Admin',
+        email: 'admin@example.com',
+        phone: '1234567890',
         password: await bcrypt.hash('password', 10),
-      },
-      {
-        username: 'user1',
-        password: await bcrypt.hash('admin123', 10),
       },
     ];
 
-    await User.insertMany(users);
-    console.log('✅ Sample users inserted:', users.map(u => u.username).join(', '));
+    // Insert users and log the result
+    const insertedUsers = await User.insertMany(users);
+    console.log('✅ Sample users inserted:', insertedUsers.map(u => u.email).join(', '));
+
   } catch (err) {
     console.error('❌ Seeding error:', err.message);
   } finally {
